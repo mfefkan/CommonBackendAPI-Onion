@@ -1,0 +1,15 @@
+﻿namespace Domain.Entities
+{
+    public class User : BaseEntity
+    {
+        public int Id { get; set; } // Birincil anahtar
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public string FullName { get; set; }
+        public string Role { get; set; }
+
+        // Navigation Property
+        public UserProfile UserProfile { get; set; } // Bire bir ilişki
+
+    }
+}
