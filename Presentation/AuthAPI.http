@@ -1,6 +1,11 @@
 @CommonBackendAPI_HostAddress = http://localhost:5154
 
-GET {{CommonBackendAPI_HostAddress}}/weatherforecast/
-Accept: application/json
+GET {{CommonBackendAPI_HostAddress}}/user/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "testpassword"
+}
 
 ###

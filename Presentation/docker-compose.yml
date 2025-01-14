@@ -1,14 +1,14 @@
-version: '3.8'
 services:
   api:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: ./Presentation/Dockerfile
     ports:
-      - "5000:8080"
+      - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=CommonBackendDB;Username=postgres;Password=yourpassword
+      - ConnectionStrings__WriteConnection=Host=db;Port=5432;Database=CommonBackendDB;Username=CommonBackendWrite;Password=admin123
+      - ConnectionStrings__ReadConnection=Host=db;Port=5432;Database=CommonBackendDB;Username=CommonBackendRead;Password=admin123
     depends_on:
       - db
 
@@ -17,12 +17,13 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_PASSWORD: admin123
       POSTGRES_DB: CommonBackendDB
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
 
 volumes:
   postgres_data:

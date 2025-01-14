@@ -6,11 +6,10 @@ using Infrastructure.Database;
 using Application.Services;
 using Domain.Interfaces;
 using Infrastructure.Repositories;
-using Application;
+using Application; 
 
 
-
-
+ 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container. 
@@ -27,8 +26,7 @@ var writeConnection = builder.Configuration.GetConnectionString("WriteConnection
 // Add DbContext for reading
 var readConnection = builder.Configuration.GetConnectionString("ReadConnection");
  
-builder.Services.AddApplicationServices(writeConnection, readConnection);
-
+builder.Services.AddApplicationServices(writeConnection, readConnection); 
 // Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not found in configuration");
 
@@ -59,6 +57,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 

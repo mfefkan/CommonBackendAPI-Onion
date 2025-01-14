@@ -12,12 +12,12 @@ namespace Application.Services
             _userReadRepository = userReadRepository;
         }
 
-        public async Task<string> LoginAsync(string email, string password)
+        public async Task<string> LoginAsync(int id, string password)
         {
-            var user = await _userReadRepository.GetUserByEmailAsync(email);
+            var user = await _userReadRepository.GetByIdAsync(id);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                throw new UnauthorizedAccessException("Invalid email or password.");
+                throw new UnauthorizedAccessException("Invalid id or password.");
             }
 
             // Token oluşturma işlemleri burada yapılır

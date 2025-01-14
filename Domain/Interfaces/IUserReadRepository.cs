@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace Domain.Interfaces
 {
     public interface IUserReadRepository
-    {
-        Task<User> GetUserByEmailAsync(string email); // E-posta ile kullanıcıyı al
-
+    { 
+        Task<User> GetByIdAsync(int id);
+        Task<IEnumerable<User>> GetAllAsync();
     }
 }

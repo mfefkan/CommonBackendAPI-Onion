@@ -9,6 +9,8 @@ namespace Domain.Interfaces
 {
     public interface IUserWriteRepository
     {
-        Task AddUserAsync(User user); // Yeni kullanıcı ekle
+        Task AddAsync(User user);
+        Task UpdateAsync(User user);
+        Task DeleteAsync(int id);
     }
 }

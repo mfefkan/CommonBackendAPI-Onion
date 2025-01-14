@@ -1,0 +1,12 @@
+
+ => Migration için 2 adet contextimiz olduðu için ikisini de belirterek ayrý ayrý migration yapýyoruz
+ Migration Write => dotnet ef migrations add InitialMigration --project Infrastructure --startup-project Presentation --context AuthDBContext
+ Update Write => dotnet ef database update --project Infrastructure --startup-project Presentation --context AuthDBContext
+
+ Migration Read => dotnet ef migrations add InitialMigration --project Infrastructure --startup-project Presentation --context ReadOnlyAuthDBContext
+ Update Read => dotnet ef database update --project Infrastructure --startup-project Presentation --context ReadOnlyAuthDBContext
+
+
+
+ Dotnet tool updates için 
+ dotnet tool update --global dotnet-ef

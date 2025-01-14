@@ -19,7 +19,9 @@ namespace Infrastructure.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // User ve UserProfile arasındaki bire bir ilişkiyi tanımlayın
+
+            modelBuilder.HasDefaultSchema("public"); 
+            base.OnModelCreating(modelBuilder); 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.UserProfile)
                 .WithOne(p => p.User)

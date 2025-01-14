@@ -9,6 +9,15 @@ namespace Infrastructure.Database
 {
     public class ReadOnlyAuthDBContext : BaseDbContext
     {
-        public ReadOnlyAuthDBContext(DbContextOptions<ReadOnlyAuthDBContext> options) : base(options) { }
+        public ReadOnlyAuthDBContext(DbContextOptions<ReadOnlyAuthDBContext> options) : base(options) 
+        {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.HasAnnotation("Relational:IgnoreMigrations", true);
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
