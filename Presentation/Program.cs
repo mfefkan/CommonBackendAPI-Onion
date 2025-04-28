@@ -1,32 +1,30 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer; 
-using Microsoft.IdentityModel.Tokens; 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.EntityFrameworkCore; 
-using Infrastructure.Database;
-using Application.Services;
-using Domain.Interfaces;
-using Infrastructure.Repositories;
-using Application; 
+using Microsoft.EntityFrameworkCore;
+using Infrastructure.Database; // AppDbContext burada olacak
+using Application.Services; // AuthService burada olacak
+using Domain.Interfaces; // Gerekirse repository interface'leri
+using Infrastructure.Repositories; // Repository implementasyonlarý
 
-
- 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container. 
-builder.Services.AddControllers(); 
+// Add services to the container.
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure PostgreSQL DbContext
-builder.Services.AddScoped<IUserReadRepository, UserReadRepository>(); // DI kaydý
-builder.Services.AddScoped<IUserWriteRepository, UserWriteRepository>(); // DI kaydý
-builder.Services.AddScoped<AuthService>(); // AuthService kaydý
-// Add DbContext for writing
-var writeConnection = builder.Configuration.GetConnectionString("WriteConnection");  
-// Add DbContext for reading
-var readConnection = builder.Configuration.GetConnectionString("ReadConnection");
- 
-builder.Services.AddApplicationServices(writeConnection, readConnection); 
+// Configure MSSQL DbContext
+var writeConnection = builder.Configuration.GetConnectionString("WriteConnection");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(writeConnection));
+
+// Repository ve Service DI Kayýtlarý
+builder.Services.AddScoped<IUserReadRepository, UserReadRepository>();
+builder.Services.AddScoped<IUserWriteRepository, UserWriteRepository>();
+builder.Services.AddScoped<AuthService>();
+
 // Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not found in configuration");
 
@@ -58,14 +56,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
