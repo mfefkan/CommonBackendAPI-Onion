@@ -7,11 +7,22 @@ namespace Infrastructure.Repositories
 {
     public class UserWriteRepository :IUserWriteRepository
     {
-        private readonly AuthDBContext _context;
+        private readonly AppDbContext _context;
 
-        public UserWriteRepository(AuthDBContext context)
+        public UserWriteRepository(AppDbContext context)
         {
             _context = context;
+        }
+
+
+        public async Task<User> GetByIdAsync(int id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<User>> GetAllAsync()
+        {
+            return await _context.Users.ToListAsync();
         }
 
         public async Task AddAsync(User user)

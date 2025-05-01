@@ -20,8 +20,7 @@ var writeConnection = builder.Configuration.GetConnectionString("WriteConnection
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(writeConnection));
 
-// Repository ve Service DI Kayýtlarý
-builder.Services.AddScoped<IUserReadRepository, UserReadRepository>();
+// Repository ve Service DI Kayýtlarý 
 builder.Services.AddScoped<IUserWriteRepository, UserWriteRepository>();
 builder.Services.AddScoped<AuthService>();
 

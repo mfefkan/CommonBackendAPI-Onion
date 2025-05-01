@@ -11,13 +11,9 @@ namespace Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, string writeConnection, string readConnection)
         {
             // Write DbContext
-            services.AddDbContext<AuthDBContext>(options => options.UseNpgsql(writeConnection));
+            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(writeConnection)); 
 
-            // Read DbContext
-            services.AddDbContext<ReadOnlyAuthDBContext>(options => options.UseNpgsql(readConnection));
-
-            // Repositories
-            services.AddScoped<IUserReadRepository, UserReadRepository>();
+            // Repositories 
             services.AddScoped<IUserWriteRepository, UserWriteRepository>();
 
             return services;

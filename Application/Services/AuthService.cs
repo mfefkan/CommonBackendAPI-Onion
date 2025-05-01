@@ -5,16 +5,16 @@ namespace Application.Services
 {
     public class AuthService
     {
-        private readonly IUserReadRepository _userReadRepository;
+        private readonly IUserWriteRepository _userWriteRepository;
 
-        public AuthService(IUserReadRepository userReadRepository)
+        public AuthService(IUserWriteRepository userWriteRepository)
         {
-            _userReadRepository = userReadRepository;
+            _userWriteRepository = userWriteRepository;
         }
 
         public async Task<string> LoginAsync(int id, string password)
         {
-            var user = await _userReadRepository.GetByIdAsync(id);
+            var user = await _userWriteRepository.GetByIdAsync(id);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
                 throw new UnauthorizedAccessException("Invalid id or password.");

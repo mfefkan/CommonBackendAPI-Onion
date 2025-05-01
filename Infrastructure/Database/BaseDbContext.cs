@@ -20,7 +20,7 @@ namespace Infrastructure.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.HasDefaultSchema("public"); 
+            modelBuilder.HasDefaultSchema("dbo"); 
             base.OnModelCreating(modelBuilder); 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.UserProfile)
