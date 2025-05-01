@@ -1,8 +1,11 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs;
+using Application.Services;
+using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.DTOs;
+using System.Security.Claims;
 
 namespace Presentation.Controllers
 {
@@ -10,11 +13,12 @@ namespace Presentation.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository; 
-
-        public UserController(IUserRepository userRepository)
+        private readonly IUserRepository _userRepository;
+        private readonly AuthService _authService;
+        public UserController(IUserRepository userRepository,AuthService authService)
         {
             _userRepository = userRepository; 
+            _authService = authService;
         }
          
         [HttpGet("test")]
@@ -26,39 +30,55 @@ namespace Presentation.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> AddUser([FromBody] AddUserDto dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await _authService.RegisterAsync(dto); // DTO'yu direkt veriyoruz
+                return Ok("User added successfully!");
             }
-
-            // Manuel mapping
-            var user = new User
+            catch (Exception ex)
             {
-                Email = dto.Email,
-                PasswordHash = HashPassword(dto.Password), 
-                FullName = dto.FullName,
-                Role = dto.Role,
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true,
-                UserProfile = new UserProfile
-                {
-                    Address = dto.UserProfile.Address,
-                    PhoneNumber = dto.UserProfile.PhoneNumber,
-                    DateOfBirth = dto.UserProfile.DateOfBirth
-                }
-            };
-
-            await _userRepository.AddAsync(user);
-
-            return Ok("User added successfully!");
-        }
-         
-        private string HashPassword(string password)
-        { 
-            return password; //  BCrypt.Net.BCrypt.HashPassword(password);
+                return BadRequest(ex.Message);
+            }
         }
 
-         
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            try
+            {
+                var token = await _authService.LoginAsync(dto);
+                return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
+
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Unauthorized token");
+
+            var user = await _userRepository.GetByIdAsync(int.Parse(userId));
+
+            if (user == null)
+                return NotFound("User not found!");
+
+            return Ok(new
+            {
+                user.Id,
+                user.FullName,
+                user.Email,
+                user.Role
+            });
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {

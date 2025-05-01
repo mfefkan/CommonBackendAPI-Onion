@@ -15,10 +15,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure MSSQL DbContext
-var writeConnection = builder.Configuration.GetConnectionString("WriteConnection");
+var connection = builder.Configuration.GetConnectionString("Connection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(writeConnection));
+    options.UseSqlServer(connection));
 
 // Repository ve Service DI Kayýtlarý 
 builder.Services.AddScoped<IUserRepository, UserRepository>();

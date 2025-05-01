@@ -1,4 +1,4 @@
-﻿namespace Presentation.DTOs
+﻿namespace Application.DTOs
 {
     public class AddUserDto
     {
