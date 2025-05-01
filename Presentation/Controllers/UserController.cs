@@ -10,11 +10,11 @@ namespace Presentation.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userWriteRepository; 
+        private readonly IUserRepository _userRepository; 
 
-        public UserController(IUserRepository userWriteRepository)
+        public UserController(IUserRepository userRepository)
         {
-            _userWriteRepository = userWriteRepository; 
+            _userRepository = userRepository; 
         }
          
         [HttpGet("test")]
@@ -48,7 +48,7 @@ namespace Presentation.Controllers
                 }
             };
 
-            await _userWriteRepository.AddAsync(user);
+            await _userRepository.AddAsync(user);
 
             return Ok("User added successfully!");
         }
@@ -62,7 +62,7 @@ namespace Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _userWriteRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
                 return NotFound("User not found!");
 
