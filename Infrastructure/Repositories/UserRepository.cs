@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class UserWriteRepository :IUserWriteRepository
+    public class UserRepository :IUserRepository
     {
         private readonly AppDbContext _context;
 
-        public UserWriteRepository(AppDbContext context)
+        public UserRepository(AppDbContext context)
         {
             _context = context;
         }

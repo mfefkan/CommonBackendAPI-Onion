@@ -10,9 +10,9 @@ namespace Presentation.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserWriteRepository _userWriteRepository; 
+        private readonly IUserRepository _userWriteRepository; 
 
-        public UserController(IUserWriteRepository userWriteRepository)
+        public UserController(IUserRepository userWriteRepository)
         {
             _userWriteRepository = userWriteRepository; 
         }

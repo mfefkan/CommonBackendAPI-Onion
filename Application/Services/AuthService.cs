@@ -5,9 +5,9 @@ namespace Application.Services
 {
     public class AuthService
     {
-        private readonly IUserWriteRepository _userWriteRepository;
+        private readonly IUserRepository _userWriteRepository;
 
-        public AuthService(IUserWriteRepository userWriteRepository)
+        public AuthService(IUserRepository userWriteRepository)
         {
             _userWriteRepository = userWriteRepository;
         }

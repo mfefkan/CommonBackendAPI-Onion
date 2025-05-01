@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces
 {
-    public interface IUserWriteRepository
+    public interface IUserRepository
     {
         Task AddAsync(User user);
         Task UpdateAsync(User user);

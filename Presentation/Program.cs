@@ -21,7 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(writeConnection));
 
 // Repository ve Service DI Kayýtlarý 
-builder.Services.AddScoped<IUserWriteRepository, UserWriteRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthService>();
 
 // Configure JWT Authentication
