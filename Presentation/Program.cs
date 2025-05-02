@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient<IMailService, ResendMailService>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "CommonBackendAPI", Version = "v1" });
@@ -53,6 +54,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repository ve Service DI Kayýtlarý 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
+builder.Services.AddScoped<IEmailVerificationRepository, EmailVerificationRepository>();
 
 // Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not found in configuration");

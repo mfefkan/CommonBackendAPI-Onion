@@ -17,6 +17,9 @@ namespace Infrastructure.Database
         public DbSet<User> Users { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +40,16 @@ namespace Infrastructure.Database
             modelBuilder.Entity<User>()
                 .Property(u => u.Role)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<EmailVerificationToken>()
+                .HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId);
 
             base.OnModelCreating(modelBuilder);
         }

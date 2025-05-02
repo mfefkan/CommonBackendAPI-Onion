@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Infrastructure.Repositories;
 
 namespace Application.Services
 {
@@ -13,11 +14,18 @@ namespace Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration; // JWT ayarlarını buradan alacağız
+        private readonly IPasswordResetRepository _passwordResetRepository;
+        private readonly IMailService _mailService;
+        private readonly IEmailVerificationRepository _emailVerificationRepository; 
 
-        public AuthService(IUserRepository userRepository, IConfiguration configuration)
+        public AuthService(
+            IUserRepository userRepository,
+            IEmailVerificationRepository emailVerificationRepository,
+            IMailService mailService)
         {
             _userRepository = userRepository;
-            _configuration = configuration;
+            _emailVerificationRepository = emailVerificationRepository;
+            _mailService = mailService;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
@@ -44,8 +52,8 @@ namespace Application.Services
                 throw new InvalidOperationException("Email already exists.");
 
             var roleParsed = Enum.TryParse<UserRole>(dto.Role, out var role)
-                        ? role
-                        : throw new ArgumentException("Invalid user role.");
+                ? role
+                : throw new ArgumentException("Invalid user role.");
 
             var user = new User
             {
@@ -55,6 +63,7 @@ namespace Application.Services
                 Role = roleParsed,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
+                IsVerified = false, 
                 UserProfile = new UserProfile
                 {
                     Address = dto.UserProfile.Address,
@@ -64,16 +73,32 @@ namespace Application.Services
             };
 
             await _userRepository.AddAsync(user);
+
+            var verificationToken = new EmailVerificationToken
+            {
+                Token = Guid.NewGuid().ToString(),
+                UserId = user.Id,
+                ExpiresAt = DateTime.UtcNow.AddHours(24)
+            };
+
+            await _emailVerificationRepository.AddAsync(verificationToken);
+
+            var verificationLink = $"https://localhost:5001/api/auth/verify-email?token={verificationToken.Token}";
+            await _mailService.SendEmailAsync(
+                user.Email,
+                "E-posta Doğrulama",
+                $"Merhaba {user.FullName},\n\nLütfen e-postanı doğrulamak için şu linke tıkla:\n\n{verificationLink}\n\nBağlantı 24 saat içinde geçerlidir.");
         }
+
 
         private string GenerateJwtToken(User user)
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
-        };
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -127,6 +152,49 @@ namespace Application.Services
         public async Task LogoutAsync(string refreshToken)
         {
             await _userRepository.RevokeRefreshTokenAsync(refreshToken);
+        }
+
+        public async Task ForgotPasswordAsync(string email)
+        {
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return; 
+
+            var resetToken = new PasswordResetToken
+            {
+                UserId = user.Id,
+                Token = Guid.NewGuid().ToString(),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                IsUsed = false
+            };
+
+            await _passwordResetRepository.AddAsync(resetToken);
+
+            var resetLink = $"https://frontend.com/reset-password?token={resetToken.Token}";
+
+            var html = $@"
+                            <p>Şifre sıfırlama talebinde bulundunuz.</p>
+                            <p><a href='{resetLink}'>Şifrenizi sıfırlamak için buraya tıklayın</a></p>
+                            <p>Bu bağlantı 15 dakika boyunca geçerlidir.</p>
+            ";
+
+            await _mailService.SendEmailAsync(user.Email, "Şifre Sıfırlama", html);
+        }
+
+        public async Task ResetPasswordAsync(string token, string newPassword)
+        {
+            var resetToken = await _passwordResetRepository.GetValidTokenAsync(token);
+            if (resetToken == null)
+                throw new UnauthorizedAccessException("Unauthorized access or expired reset token.");
+
+            var user = resetToken.User;
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            await _userRepository.UpdateAsync(user);
+            await _passwordResetRepository.MarkAsUsedAsync(resetToken);
         }
 
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);

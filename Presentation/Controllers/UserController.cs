@@ -13,48 +13,12 @@ namespace Presentation.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        private readonly AuthService _authService;
+        private readonly IUserRepository _userRepository; 
         public UserController(IUserRepository userRepository,AuthService authService)
         {
-            _userRepository = userRepository; 
-            _authService = authService;
+            _userRepository = userRepository;  
         }
-         
-        [HttpGet("test")]
-        public IActionResult Test() {
-            Console.WriteLine("Test endpoint hitttttttttttt");
-            return Ok("AuthController is working!");
-        }
-
-        [HttpPost("add")]
-        public async Task<IActionResult> AddUser([FromBody] AddUserDto dto)
-        {
-            try
-            {
-                await _authService.RegisterAsync(dto); // DTO'yu direkt veriyoruz
-                return Ok("User added successfully!");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
-        {
-            try
-            {
-                LoginResponseDto loginResponse = await _authService.LoginAsync(dto);
-                return Ok(loginResponse);
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
-        }
-
+          
 
         [Authorize]
         [HttpGet("me")]
@@ -90,30 +54,7 @@ namespace Presentation.Controllers
         }
 
 
-        [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
-        {
-            try
-            {
-                var response = await _authService.RefreshTokenAsync(dto.RefreshToken);
-                return Ok(response);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = "Unexpected situation.", detail = ex.Message });
-            }
-        }
 
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogoutRequestDto dto)
-        {
-            await _authService.LogoutAsync(dto.RefreshToken);
-            return Ok(new { message = "Logout success, token canceled." });
-        }
 
     }
 }
