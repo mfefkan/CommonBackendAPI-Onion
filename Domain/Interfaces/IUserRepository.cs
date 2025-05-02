@@ -15,5 +15,8 @@ namespace Domain.Interfaces
         Task<User?> GetByEmailAsync(string email);
         Task<User> GetByIdAsync(int id);
         Task<IEnumerable<User>> GetAllAsync();
+        Task AddRefreshTokenAsync(RefreshToken token);
+        Task<RefreshToken> GetRefreshTokenAsync(string token);
+        Task RevokeRefreshTokenAsync(string token);
     }
 }

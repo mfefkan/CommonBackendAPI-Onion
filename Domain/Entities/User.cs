@@ -10,6 +10,8 @@
 
         // Navigation Property
         public UserProfile UserProfile { get; set; } // Bire bir ilişki
+        public List<RefreshToken> RefreshTokens { get; set; }
+
 
     }
 }

@@ -6,8 +6,7 @@ namespace Infrastructure.Database
     public class AppDbContext : BaseDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-        public DbSet<User> Users { get; set; }
+         
 
         public override int SaveChanges()
         {

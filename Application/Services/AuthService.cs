@@ -20,13 +20,21 @@ namespace Application.Services
             _configuration = configuration;
         }
 
-        public async Task<string> LoginAsync(LoginDto dto)
+        public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
         {
             var user = await _userRepository.GetByEmailAsync(dto.Email);
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid credentials.");
 
-            return GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken(user.Id);
+            await _userRepository.AddRefreshTokenAsync(refreshToken);
+            var generatedAccesToken = GenerateJwtToken(user);
+
+            return new LoginResponseDto
+            {
+                AccessToken = generatedAccesToken,
+                RefreshToken = refreshToken.Token
+            };
         }
 
         public async Task RegisterAsync(AddUserDto dto)
@@ -74,6 +82,47 @@ namespace Application.Services
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private RefreshToken GenerateRefreshToken(int userId)
+        {
+            return new RefreshToken
+            {
+                Token = Guid.NewGuid().ToString(),
+                UserId = userId,
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+
+        public async Task<RefreshResponseDto> RefreshTokenAsync(string refreshTokenStr)
+        {
+            var token = await _userRepository.GetRefreshTokenAsync(refreshTokenStr);
+
+            if (token == null || token.IsRevoked || token.ExpiresAt < DateTime.UtcNow)
+            {
+                throw new UnauthorizedAccessException("Unauthorized access or expired refresh token.");
+            }
+
+            var user = await _userRepository.GetByIdAsync(token.UserId);
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User not found.");
+            }
+             
+            var accessToken = GenerateJwtToken(user); 
+
+            return new RefreshResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = token.Token 
+            };
+        }
+
+        public async Task LogoutAsync(string refreshToken)
+        {
+            await _userRepository.RevokeRefreshTokenAsync(refreshToken);
         }
 
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);

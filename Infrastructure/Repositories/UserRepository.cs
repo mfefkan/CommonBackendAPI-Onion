@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class UserRepository :IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly AppDbContext _context;
 
@@ -47,6 +47,35 @@ namespace Infrastructure.Repositories
             if (user != null)
             {
                 _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task AddRefreshTokenAsync(RefreshToken token)
+        {
+            await _context.RefreshTokens.AddAsync(token);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<RefreshToken> GetRefreshTokenAsync(string token)
+        {
+            var refreshToken = await _context.RefreshTokens
+                                        .Include(r => r.User)
+                                        .FirstOrDefaultAsync(r => r.Token == token);
+
+            if (refreshToken?.User == null)
+                throw new UnauthorizedAccessException("Kullanıcı bulunamadı.");
+
+            return refreshToken;
+        }
+
+        public async Task RevokeRefreshTokenAsync(string token)
+        {
+            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(r => r.Token == token);
+
+            if (refreshToken != null)
+            {
+                refreshToken.IsRevoked = true;
                 await _context.SaveChangesAsync();
             }
         }

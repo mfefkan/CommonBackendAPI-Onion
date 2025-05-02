@@ -16,16 +16,23 @@ namespace Infrastructure.Database
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.HasDefaultSchema("dbo"); 
-            base.OnModelCreating(modelBuilder); 
+            modelBuilder.HasDefaultSchema("dbo");  
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.UserProfile)
                 .WithOne(p => p.User)
                 .HasForeignKey<UserProfile>(p => p.UserId);
+
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(r=> r.User)
+                .WithMany(p=> p.RefreshTokens)
+                .HasForeignKey(r=>r.UserId);
 
             base.OnModelCreating(modelBuilder);
         }

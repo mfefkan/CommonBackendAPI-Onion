@@ -46,8 +46,8 @@ namespace Presentation.Controllers
         {
             try
             {
-                var token = await _authService.LoginAsync(dto);
-                return Ok(new { token });
+                LoginResponseDto loginResponse = await _authService.LoginAsync(dto);
+                return Ok(loginResponse);
             }
             catch (Exception ex)
             {
@@ -90,7 +90,30 @@ namespace Presentation.Controllers
         }
 
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
+        {
+            try
+            {
+                var response = await _authService.RefreshTokenAsync(dto.RefreshToken);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Unexpected situation.", detail = ex.Message });
+            }
+        }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequestDto dto)
+        {
+            await _authService.LogoutAsync(dto.RefreshToken);
+            return Ok(new { message = "Logout success, token canceled." });
+        }
 
     }
 }
