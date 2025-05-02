@@ -34,6 +34,10 @@ namespace Infrastructure.Database
                 .WithMany(p=> p.RefreshTokens)
                 .HasForeignKey(r=>r.UserId);
 
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
+
             base.OnModelCreating(modelBuilder);
         }
     }

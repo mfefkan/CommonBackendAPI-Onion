@@ -43,12 +43,16 @@ namespace Application.Services
             if (existingUser != null)
                 throw new InvalidOperationException("Email already exists.");
 
+            var roleParsed = Enum.TryParse<UserRole>(dto.Role, out var role)
+                        ? role
+                        : throw new ArgumentException("Invalid user role.");
+
             var user = new User
             {
                 Email = dto.Email,
                 PasswordHash = HashPassword(dto.Password),
                 FullName = dto.FullName,
-                Role = dto.Role,
+                Role = roleParsed,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
                 UserProfile = new UserProfile
@@ -68,7 +72,7 @@ namespace Application.Services
             {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
