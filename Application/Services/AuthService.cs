@@ -13,19 +13,26 @@ namespace Application.Services
     public class AuthService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IConfiguration _configuration; // JWT ayarlarını buradan alacağız
+        private readonly IConfiguration _configuration; 
         private readonly IPasswordResetRepository _passwordResetRepository;
         private readonly IMailService _mailService;
         private readonly IEmailVerificationRepository _emailVerificationRepository; 
+        private readonly IOtpCodeRepository _otpRepository;
 
         public AuthService(
             IUserRepository userRepository,
             IEmailVerificationRepository emailVerificationRepository,
-            IMailService mailService)
+            IMailService mailService,
+            IConfiguration configuration,
+            IPasswordResetRepository passwordResetRepository,
+            IOtpCodeRepository otpRepository)
         {
             _userRepository = userRepository;
             _emailVerificationRepository = emailVerificationRepository;
             _mailService = mailService;
+            _configuration = configuration;
+            _passwordResetRepository = passwordResetRepository;
+            _otpRepository = otpRepository;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
@@ -196,7 +203,8 @@ namespace Application.Services
             await _userRepository.UpdateAsync(user);
             await _passwordResetRepository.MarkAsUsedAsync(resetToken);
         }
-
+         
+         
         private string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
         private bool VerifyPassword(string password, string hash) => BCrypt.Net.BCrypt.Verify(password, hash);
     }

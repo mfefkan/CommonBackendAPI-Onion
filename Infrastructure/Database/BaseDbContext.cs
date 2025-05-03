@@ -19,6 +19,7 @@ namespace Infrastructure.Database
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
+        public DbSet<OtpCode> OtpCodes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,25 +32,37 @@ namespace Infrastructure.Database
                 .WithOne(p => p.User)
                 .HasForeignKey<UserProfile>(p => p.UserId);
 
-
-            modelBuilder.Entity<RefreshToken>()
-                .HasOne(r=> r.User)
-                .WithMany(p=> p.RefreshTokens)
-                .HasForeignKey(r=>r.UserId);
-
             modelBuilder.Entity<User>()
                 .Property(u => u.Role)
                 .HasConversion<string>();
 
+            modelBuilder.Entity<UserProfile>()
+                .Property(p => p.UserId)
+                .IsRequired();
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(r=> r.User)
+                .WithMany()
+                .HasForeignKey(r=>r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+             
             modelBuilder.Entity<PasswordResetToken>()
                 .HasOne(p => p.User)
                 .WithMany()
-                .HasForeignKey(p => p.UserId);
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<EmailVerificationToken>()
                 .HasOne(e => e.User)
                 .WithMany()
-                .HasForeignKey(e => e.UserId);
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+             
+            modelBuilder.Entity<OtpCode>()
+               .HasOne(o => o.User)
+               .WithMany()
+               .HasForeignKey(o => o.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

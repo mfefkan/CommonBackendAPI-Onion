@@ -122,6 +122,7 @@ namespace Presentation.Controllers
 
             return Ok("E-posta adresiniz başarıyla doğrulandı.");
         }
+         
 
     }
 }
