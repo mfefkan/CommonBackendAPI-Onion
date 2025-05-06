@@ -14,5 +14,6 @@ namespace Domain.Entities
         public string Code { get; set; } = null!;
         public DateTime ExpiresAt { get; set; }
         public bool IsUsed { get; set; } = false;
+
     }
 }

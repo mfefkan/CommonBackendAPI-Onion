@@ -17,7 +17,7 @@ namespace Application.Services
         private readonly IPasswordResetRepository _passwordResetRepository;
         private readonly IMailService _mailService;
         private readonly IEmailVerificationRepository _emailVerificationRepository; 
-        private readonly IOtpCodeRepository _otpRepository;
+        private readonly IOtpCodeRepository _otpCodeRepository;
 
         public AuthService(
             IUserRepository userRepository,
@@ -25,14 +25,14 @@ namespace Application.Services
             IMailService mailService,
             IConfiguration configuration,
             IPasswordResetRepository passwordResetRepository,
-            IOtpCodeRepository otpRepository)
+            IOtpCodeRepository otpCodeRepository)
         {
             _userRepository = userRepository;
             _emailVerificationRepository = emailVerificationRepository;
             _mailService = mailService;
             _configuration = configuration;
             _passwordResetRepository = passwordResetRepository;
-            _otpRepository = otpRepository;
+            _otpCodeRepository = otpCodeRepository;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
@@ -41,6 +41,26 @@ namespace Application.Services
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid credentials.");
 
+
+            bool otpEnabled = bool.TryParse(_configuration["Otp:Enabled"], out var enabled) && enabled;
+            if (otpEnabled)
+            {
+                var otpCode = new OtpCode
+                {
+                    UserId = user.Id,
+                    Code = new Random().Next(100000, 999999).ToString(),
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+                    IsUsed = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _otpCodeRepository.AddAsync(otpCode);  
+                await _mailService.SendEmailAsync(user.Email, "OTP Kodu", $"Giriş için OTP kodunuz: {otpCode.Code}");
+
+                throw new UnauthorizedAccessException("OTP gönderildi. Lütfen kodu doğrulayın.");
+            }
+             
+
             var refreshToken = GenerateRefreshToken(user.Id);
             await _userRepository.AddRefreshTokenAsync(refreshToken);
             var generatedAccesToken = GenerateJwtToken(user);
@@ -48,6 +68,30 @@ namespace Application.Services
             return new LoginResponseDto
             {
                 AccessToken = generatedAccesToken,
+                RefreshToken = refreshToken.Token
+            };
+        }
+
+        public async Task<LoginResponseDto> VerifyOtpLoginAsync(string email, string otpCode)
+        {
+            var user = await _userRepository.GetByEmailAsync(email)
+                       ?? throw new UnauthorizedAccessException("User not found.");
+
+            var otp = await _otpCodeRepository.GetLatestValidOtpAsync(user.Id, otpCode);
+            if (otp == null)
+                throw new UnauthorizedAccessException("Invalid or expired OTP code.");
+
+            otp.IsUsed = true;
+            await _otpCodeRepository.MarkAsUsedAsync(otp);
+
+            var refreshToken = GenerateRefreshToken(user.Id);
+            await _userRepository.AddRefreshTokenAsync(refreshToken);
+
+            var accessToken = GenerateJwtToken(user);
+
+            return new LoginResponseDto
+            {
+                AccessToken = accessToken,
                 RefreshToken = refreshToken.Token
             };
         }

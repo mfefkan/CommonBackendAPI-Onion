@@ -50,6 +50,20 @@ namespace Presentation.Controllers
         }
 
 
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] OtpLoginDto dto)
+        {
+            try
+            {
+                var response = await _authService.VerifyOtpLoginAsync(dto.Email, dto.OtpCode);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
         {
