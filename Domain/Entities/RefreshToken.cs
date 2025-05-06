@@ -12,8 +12,7 @@ namespace Domain.Entities
         public int UserId { get; set; }
         public DateTime ExpiresAt { get; set; }
         public bool IsRevoked { get; set; }
-
-        // Navigation
+         
         public User User { get; set; }
     }
 }

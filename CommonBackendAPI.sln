@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F76B5B3B-1F2E-4683-9986-8FCDDBDE07AA}"
 	ProjectSection(SolutionItems) = preProject
-		Proje Döküman.txt = Proje Döküman.txt
+		x.txt = x.txt
 	EndProjectSection
 EndProject
 Global
