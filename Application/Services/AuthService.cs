@@ -38,6 +38,10 @@ namespace Application.Services
         public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
         {
             var user = await _userRepository.GetByEmailAsync(dto.Email);
+
+            if (user.FromApp != dto.FromApp)
+                throw new UnauthorizedAccessException("Invalid credentials.");
+
             if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid credentials.");
 

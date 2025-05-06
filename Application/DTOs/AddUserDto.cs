@@ -1,4 +1,6 @@
-﻿namespace Application.DTOs
+﻿using Domain.Entities;
+
+namespace Application.DTOs
 {
     public class AddUserDto
     {
@@ -8,6 +10,7 @@
         public string FullName { get; set; }
         public string Role { get; set; }
         public UserProfileDto UserProfile { get; set; }
+        public ClientApp FromApp { get; set; }
     }
 
     public class UserProfileDto

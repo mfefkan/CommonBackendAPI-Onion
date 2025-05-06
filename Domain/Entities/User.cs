@@ -7,6 +7,7 @@
         public string FullName { get; set; }
         public UserRole Role { get; set; }
         public bool IsVerified { get; set; } = false;
+        public ClientApp FromApp { get; set; }
         // Navigation Property
         public UserProfile UserProfile { get; set; } 
 

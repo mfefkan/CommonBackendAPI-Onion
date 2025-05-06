@@ -1,0 +1,9 @@
+
+
+ Migration Write => dotnet ef migrations add InitialMigration --project Infrastructure --startup-project Presentation --context AuthDBContext
+ Update Write => dotnet ef database update --project Infrastructure --startup-project Presentation --context AuthDBContext 
+ Migration Read => dotnet ef migrations add InitialMigration --project Infrastructure --startup-project Presentation --context ReadOnlyAuthDBContext
+ Update Read => dotnet ef database update --project Infrastructure --startup-project Presentation --context ReadOnlyAuthDBContext 
+ dotnet tool update --global dotnet-ef 
+ dotnet ef migrations add X --project Infrastructure --startup-project Presentation
+dotnet ef database update --project Infrastructure --startup-project Presentation

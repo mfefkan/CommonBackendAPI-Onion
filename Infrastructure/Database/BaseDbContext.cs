@@ -23,8 +23,7 @@ namespace Infrastructure.Database
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-
+        { 
             modelBuilder.HasDefaultSchema("dbo");  
 
             modelBuilder.Entity<User>()
@@ -63,6 +62,10 @@ namespace Infrastructure.Database
                .WithMany()
                .HasForeignKey(o => o.UserId)
                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+               .Property(u => u.FromApp)
+               .HasConversion<string>();
 
             base.OnModelCreating(modelBuilder);
         }
