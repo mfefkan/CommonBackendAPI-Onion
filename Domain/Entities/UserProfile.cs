@@ -2,15 +2,15 @@
 {
     public class UserProfile
     {
-        public int Id { get; set; } // Birincil anahtar (User.Id ile eşleşecek) 
+        public int Id { get; set; } 
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
         public DateTime DateOfBirth { get; set; }
 
-        // Foreign Key
+        
         public int UserId { get; set; }
 
-        // Navigation Property
-        public User User { get; set; } // Bire bir ilişki
+        
+        public User User { get; set; }
     }
 }

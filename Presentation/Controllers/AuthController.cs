@@ -26,7 +26,7 @@ namespace Presentation.Controllers
         {
             try
             {
-                await _authService.RegisterAsync(dto); // DTO'yu direkt veriyoruz
+                await _authService.RegisterAsync(dto); 
                 return Ok("User added successfully!");
             }
             catch (Exception ex)
@@ -95,7 +95,7 @@ namespace Presentation.Controllers
             try
             {
                 await _authService.ForgotPasswordAsync(dto.Email);
-                return Ok(new { message = "Şifre sıfırlama bağlantısı gönderildi (varsa)." });
+                return Ok(new { message = "Password reset link has send." });
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace Presentation.Controllers
             try
             {
                 await _authService.ResetPasswordAsync(dto.Token, dto.NewPassword);
-                return Ok(new { message = "Şifreniz başarıyla güncellendi." });
+                return Ok(new { message = "Password updated successfully." });
             }
             catch (Exception ex)
             {
@@ -123,7 +123,7 @@ namespace Presentation.Controllers
             var emailVerification = await _emailVerificationRepository.GetByTokenAsync(token);
             if (emailVerification == null)
             {
-                return BadRequest("Geçersiz veya süresi dolmuş doğrulama bağlantısı.");
+                return BadRequest("Unauthorized or expired verify link.");
             }
              
             var user = emailVerification.User!;
@@ -134,7 +134,7 @@ namespace Presentation.Controllers
             emailVerification.IsUsed = true;
             await _emailVerificationRepository.MarkAsUsedAsync(emailVerification);
 
-            return Ok("E-posta adresiniz başarıyla doğrulandı.");
+            return Ok("E-mail verify process successfull!");
         }
          
 

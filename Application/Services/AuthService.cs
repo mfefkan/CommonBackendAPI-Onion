@@ -59,9 +59,9 @@ namespace Application.Services
                 };
 
                 await _otpCodeRepository.AddAsync(otpCode);  
-                await _mailService.SendEmailAsync(user.Email, "OTP Kodu", $"Giriş için OTP kodunuz: {otpCode.Code}");
+                await _mailService.SendEmailAsync(user.Email, "OTP Code", $"OTP Code for login: {otpCode.Code}");
 
-                throw new UnauthorizedAccessException("OTP gönderildi. Lütfen kodu doğrulayın.");
+                throw new UnauthorizedAccessException("OTP Code has send. Please verify to login.");
             }
              
 
@@ -228,12 +228,12 @@ namespace Application.Services
             var resetLink = $"https://frontend.com/reset-password?token={resetToken.Token}";
 
             var html = $@"
-                            <p>Şifre sıfırlama talebinde bulundunuz.</p>
-                            <p><a href='{resetLink}'>Şifrenizi sıfırlamak için buraya tıklayın</a></p>
-                            <p>Bu bağlantı 15 dakika boyunca geçerlidir.</p>
+                            <p>You have requested a password reset.</p>
+                            <p><a href='{resetLink}'>Please click to reset password</a></p>
+                            <p>This link be able to acces only 15 min.</p>
             ";
 
-            await _mailService.SendEmailAsync(user.Email, "Şifre Sıfırlama", html);
+            await _mailService.SendEmailAsync(user.Email, "Reset Password", html);
         }
 
         public async Task ResetPasswordAsync(string token, string newPassword)

@@ -5,12 +5,12 @@ namespace Domain.Entities
     public abstract class BaseEntity
     {
         [Key]
-        public int Id { get; set; } // Her tablonun birincil anahtarı
+        public int Id { get; set; } 
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Oluşturulma zamanı
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; 
 
-        public DateTime? UpdatedAt { get; set; } // Güncellenme zamanı
+        public DateTime? UpdatedAt { get; set; } 
 
-        public bool IsActive { get; set; } = true; // Aktif/Pasif durumu
+        public bool IsActive { get; set; } = true; 
     }
 }

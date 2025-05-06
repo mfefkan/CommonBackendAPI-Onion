@@ -40,7 +40,7 @@ namespace Application.Services
 
             await _otpRepository.AddAsync(otp);
 
-            await _mailService.SendEmailAsync(user.Email, "OTP Kodu", $"Giriş için kodunuz: {otp.Code}");
+            await _mailService.SendEmailAsync(user.Email, "OTP Code", $"OTP Code for login: {otp.Code}");
         }
 
         public async Task<bool> VerifyOtpAsync(int userId, string code)

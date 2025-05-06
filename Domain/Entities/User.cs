@@ -8,11 +8,10 @@
         public UserRole Role { get; set; }
         public bool IsVerified { get; set; } = false;
         public ClientApp FromApp { get; set; }
-        // Navigation Property
         public UserProfile UserProfile { get; set; } 
 
 
-        // Gerekli görmediğim için kaldırdım.
+        // I decided to passive.
         //public List<RefreshToken> RefreshTokens { get; set; }
         //public ICollection<OtpCode> OtpCodes { get; set; } = new List<OtpCode>();
 

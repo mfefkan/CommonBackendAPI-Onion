@@ -9,7 +9,6 @@ namespace Domain.Entities
     public enum ClientApp
     {
          EfkanHukuk = 1,
-         X = 2,
-        // Diğer projeler...
+         X = 2, 
     }
 }
