@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Database; // AppDbContext burada olacak
 using Application.Services; // AuthService burada olacak
 using Domain.Interfaces; // Gerekirse repository interface'leri
-using Infrastructure.Repositories; // Repository implementasyonlarý
+using Infrastructure.Repositories;
+using AspNetCoreRateLimit; // Repository implementasyonlarý
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,7 +59,10 @@ builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 builder.Services.AddScoped<IEmailVerificationRepository, EmailVerificationRepository>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
-
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 // Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not found in configuration");
 
@@ -93,5 +97,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseIpRateLimiting();
 app.MapControllers();
 app.Run();
